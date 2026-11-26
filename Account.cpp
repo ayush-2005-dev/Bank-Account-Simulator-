@@ -1,3 +1,5 @@
+#include <iomanip>
+#include <iostream>
 #include "Account.h"
 
 Account::Account(const std::string& name, int accountNumber, double initialBalance)
@@ -15,11 +17,16 @@ double Account::getBalance() const {
     return balance;
 }
 
+const std::vector<Transaction>& Account::getHistory() const {
+    return history;
+}
+
 bool Account::deposit(double amount) {
     if (amount <= 0) {
         return false;
     }
     balance += amount;
+    history.push_back({"Deposit", amount, balance});
     return true;
 }
 
@@ -28,5 +35,28 @@ bool Account::withdraw(double amount) {
         return false;
     }
     balance -= amount;
+    history.push_back({"Withdrawal", amount, balance});
     return true;
+}
+
+void Account::printHistory() const {
+    std::cout << "Transaction history for " << name
+              << " (#" << accountNumber << ")\n";
+
+    if (history.empty()) {
+        std::cout << "  No transactions yet.\n";
+        return;
+    }
+
+    std::cout << std::left << std::setw(14) << "Type"
+              << std::right << std::setw(12) << "Amount"
+              << std::setw(16) << "Balance after" << "\n";
+    std::cout << std::string(42, '-') << "\n";
+
+    for (const Transaction& t : history) {
+        std::cout << std::left << std::setw(14) << t.type
+                  << std::right << std::fixed << std::setprecision(2)
+                  << std::setw(12) << t.amount
+                  << std::setw(16) << t.balanceAfter << "\n";
+    }
 }
