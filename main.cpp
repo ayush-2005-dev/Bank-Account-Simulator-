@@ -1,12 +1,31 @@
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include "Account.h"
 
 int main() {
-    Account acc("Ayush", 1001, 500.0);
-    acc.load("account.txt");   // restores saved data if the file exists
-    int choice = 0;
+    const std::string dataFile = "account.txt";
+    Account acc("", 0, 0.0);
 
+    if (acc.load(dataFile)) {
+        std::cout << "Welcome back, " << acc.getName() << ".\n";
+    } else {
+        std::string name;
+        int number;
+        double startBalance;
+
+        std::cout << "No saved account found. Let's create one.\n";
+        std::cout << "Name: ";
+        std::getline(std::cin, name);
+        std::cout << "Account number: ";
+        std::cin >> number;
+        std::cout << "Starting balance: ";
+        std::cin >> startBalance;
+
+        acc = Account(name, number, startBalance);
+    }
+
+    int choice = 0;
     do {
         std::cout << "\n1. Deposit\n"
                   << "2. Withdraw\n"
@@ -16,7 +35,7 @@ int main() {
                   << "Choice: ";
 
         if (!(std::cin >> choice)) {
-            break;   // input ended or was not a number
+            break;
         }
 
         if (choice == 1) {
@@ -46,7 +65,8 @@ int main() {
             std::cout << "Unknown option.\n";
         }
     } while (choice != 0);
-      if (acc.save("account.txt")) {
+
+    if (acc.save(dataFile)) {
         std::cout << "Account saved.\n";
     } else {
         std::cout << "Could not save account.\n";
