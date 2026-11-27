@@ -27,6 +27,8 @@ public:
 
     bool deposit(double amount);
     bool withdraw(double amount);
+
+    void printHistory() const;
 };
 
 #endif
