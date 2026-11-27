@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include "Account.h"
@@ -59,4 +60,38 @@ void Account::printHistory() const {
                   << std::setw(12) << t.amount
                   << std::setw(16) << t.balanceAfter << "\n";
     }
+}
+
+bool Account::save(const std::string& filename) const {
+    std::ofstream out(filename);
+    if (!out) {
+        return false;
+    }
+
+    out << std::fixed << std::setprecision(2);
+    out << name << "\n";
+    out << accountNumber << " " << balance << "\n";
+    for (const Transaction& t : history) {
+        out << t.type << " " << t.amount << " " << t.balanceAfter << "\n";
+    }
+    return true;
+}
+
+bool Account::load(const std::string& filename) {
+    std::ifstream in(filename);
+    if (!in) {
+        return false;   // no file yet, keep the current data
+    }
+
+    std::getline(in, name);
+    if (!(in >> accountNumber >> balance)) {
+        return false;
+    }
+
+    history.clear();
+    Transaction t;
+    while (in >> t.type >> t.amount >> t.balanceAfter) {
+        history.push_back(t);
+    }
+    return true;
 }
