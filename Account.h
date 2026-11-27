@@ -29,6 +29,8 @@ public:
     bool withdraw(double amount);
 
     void printHistory() const;
+    bool save(const std::string& filename) const;
+    bool load(const std::string& filename);
 };
 
 #endif

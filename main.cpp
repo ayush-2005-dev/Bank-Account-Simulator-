@@ -4,6 +4,7 @@
 
 int main() {
     Account acc("Ayush", 1001, 500.0);
+    acc.load("account.txt");   // restores saved data if the file exists
     int choice = 0;
 
     do {
@@ -45,7 +46,11 @@ int main() {
             std::cout << "Unknown option.\n";
         }
     } while (choice != 0);
-
+      if (acc.save("account.txt")) {
+        std::cout << "Account saved.\n";
+    } else {
+        std::cout << "Could not save account.\n";
+    }
     std::cout << "Goodbye.\n";
     return 0;
 }
