@@ -17,6 +17,7 @@ bool readAmount(double& value) {
 int main() {
     const std::string dataFile = "account.txt";
     Account acc("", 0, 0.0);
+    bool changed = false;   // true when there is something new to save
 
     if (acc.load(dataFile)) {
         std::cout << "Welcome back, " << acc.getName() << ".\n";
@@ -34,6 +35,7 @@ int main() {
         std::cin >> startBalance;
 
         acc = Account(name, number, startBalance);
+        changed = true;     // a new account must be saved, or it will be asked for again
     }
 
     int choice = 0;
@@ -42,11 +44,12 @@ int main() {
                   << "2. Withdraw\n"
                   << "3. Show balance\n"
                   << "4. Show history\n"
+                  << "5. Account details\n"
                   << "0. Exit\n"
                   << "Choice: ";
 
-        choice = -1;   // a failed read sets choice to 0, so reset it to a non-exit value
-                if (!(std::cin >> choice)) {
+        choice = -1;
+        if (!(std::cin >> choice)) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             choice = -1;   // a failed read sets choice to 0, which would exit the loop
@@ -62,6 +65,7 @@ int main() {
                 continue;
             }
             if (acc.deposit(amount)) {
+                changed = true;
                 std::cout << "Deposit successful.\n";
             } else {
                 std::cout << "Invalid amount.\n";
@@ -74,6 +78,7 @@ int main() {
                 continue;
             }
             if (acc.withdraw(amount)) {
+                changed = true;
                 std::cout << "Withdrawal successful.\n";
             } else {
                 std::cout << "Withdrawal failed: invalid amount or insufficient funds.\n";
@@ -83,15 +88,24 @@ int main() {
                       << "Balance: " << acc.getBalance() << "\n";
         } else if (choice == 4) {
             acc.printHistory();
+        } else if (choice == 5) {
+            std::cout << "Name: " << acc.getName() << "\n"
+                      << "Account number: " << acc.getAccountNumber() << "\n"
+                      << std::fixed << std::setprecision(2)
+                      << "Balance: " << acc.getBalance() << "\n";
         } else if (choice != 0) {
             std::cout << "Unknown option.\n";
         }
     } while (choice != 0);
 
-    if (acc.save(dataFile)) {
-        std::cout << "Account saved.\n";
+    if (changed) {
+        if (acc.save(dataFile)) {
+            std::cout << "Changes saved.\n";
+        } else {
+            std::cout << "Could not save account.\n";
+        }
     } else {
-        std::cout << "Could not save account.\n";
+        std::cout << "No changes to save.\n";
     }
     std::cout << "Goodbye.\n";
     return 0;
