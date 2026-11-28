@@ -1,7 +1,18 @@
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include "Account.h"
+
+// Reads a double. If the input isn't a number, clears the error and discards the bad line.
+bool readAmount(double& value) {
+    if (std::cin >> value) {
+        return true;
+    }
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return false;
+}
 
 int main() {
     const std::string dataFile = "account.txt";
@@ -34,14 +45,22 @@ int main() {
                   << "0. Exit\n"
                   << "Choice: ";
 
-        if (!(std::cin >> choice)) {
-            break;
+        choice = -1;   // a failed read sets choice to 0, so reset it to a non-exit value
+                if (!(std::cin >> choice)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            choice = -1;   // a failed read sets choice to 0, which would exit the loop
+            std::cout << "Please enter a number from the menu.\n";
+            continue;
         }
 
         if (choice == 1) {
             double amount;
             std::cout << "Amount: ";
-            std::cin >> amount;
+            if (!readAmount(amount)) {
+                std::cout << "Please enter a number.\n";
+                continue;
+            }
             if (acc.deposit(amount)) {
                 std::cout << "Deposit successful.\n";
             } else {
@@ -50,7 +69,10 @@ int main() {
         } else if (choice == 2) {
             double amount;
             std::cout << "Amount: ";
-            std::cin >> amount;
+            if (!readAmount(amount)) {
+                std::cout << "Please enter a number.\n";
+                continue;
+            }
             if (acc.withdraw(amount)) {
                 std::cout << "Withdrawal successful.\n";
             } else {
